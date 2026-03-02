@@ -59,6 +59,9 @@ class Ui_MainWindow(object):
         self.pushButton = QtWidgets.QPushButton(parent=self.centralwidget)
         self.pushButton.setGeometry(QtCore.QRect(430, 50, 141, 24))
         self.pushButton.setObjectName("pushButton")
+        self.btnSQLi = QtWidgets.QPushButton(parent=self.centralwidget)
+        self.btnSQLi.setGeometry(QtCore.QRect(580, 50, 91, 24))
+        self.btnSQLi.setObjectName("btnSQLi")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(parent=MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 924, 22))
@@ -89,6 +92,7 @@ class Ui_MainWindow(object):
         item.setText(_translate("MainWindow", "TRẠNG THÁI"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Tab_2), _translate("MainWindow", "Kết quả "))
         self.pushButton.setText(_translate("MainWindow", "Tấn công path traversal"))
+        self.btnSQLi.setText(_translate("MainWindow", "Tấn công SQLi"))
 
 
 if __name__ == "__main__":

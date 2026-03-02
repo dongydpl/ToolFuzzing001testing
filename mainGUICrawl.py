@@ -6,6 +6,7 @@ from PyQt6.QtCore import Qt
 from GUICrawl import Ui_MainWindow       # Import Giao diện
 from feature_crawl import CrawlerThread  # Import logic nút Crawl
 from feature_lfi import LFIThread        # Import logic nút Tấn công
+from feature_sqli import SQLiThread  # Import logic nút SQLi 
 
 class PhanMemLFI(QMainWindow):
     def __init__(self):
@@ -28,6 +29,8 @@ class PhanMemLFI(QMainWindow):
         self.ui.jBntScan.clicked.connect(self.xu_ly_crawl)
         self.ui.pushButton.clicked.connect(self.xu_ly_lfi)
         self.ui.pushButton.setEnabled(False)
+        self.ui.btnSQLi.clicked.connect(self.xu_ly_sqli)
+        self.ui.btnSQLi.setEnabled(False) # Mặc định tắt khi chưa có link ngon nào
 
     # ==========================================
     # PHẦN XỬ LÝ NÚT CRAWL (GỌI FILE 1)
@@ -52,7 +55,7 @@ class PhanMemLFI(QMainWindow):
         self.ui.jBntScan.setEnabled(False)  # Khóa nút quét
         self.ui.jBntScan.setText("Đang chạy...")  # Đổi tên nút
 
-        # 4. Khởi tạo "Công nhân" Crawler (Độ sâu 2 để test cho nhanh)
+        # 4. Khởi tạo "Công nhân" Crawler (Độ sâu 3 để test cho nhanh)
         self.crawler = CrawlerThread(url, 3)
 
         # --- [QUAN TRỌNG] KẾT NỐI TÍN HIỆU (TÊN TIẾNG VIỆT) ---
@@ -72,6 +75,7 @@ class PhanMemLFI(QMainWindow):
         self.ui.jBntScan.setEnabled(True)
         if len(self.danh_sach_muc_tieu) > 0:
             self.ui.pushButton.setEnabled(True)
+            self.ui.btnSQLi.setEnabled(True)
             QMessageBox.information(self, "Thông báo", f"Tìm thấy {len(self.danh_sach_muc_tieu)} link ngon!\nSẵn sàng tấn công.")
         else:
             QMessageBox.warning(self, "Thông báo", "Không tìm thấy link nào.")
@@ -103,7 +107,19 @@ class PhanMemLFI(QMainWindow):
         item_status = QTableWidgetItem(status)
         item_status.setForeground(Qt.GlobalColor.red)
         self.ui.tableWidget.setItem(row, 3, item_status)
-
+     # ==========================================
+    # PHẦN XỬ LÝ NÚT SQLi (GỌI FILE 3)
+    # ==========================================
+    def xu_ly_sqli(self):
+        self.ui.tableWidget.setRowCount(0)
+        self.attacker_sql = SQLiThread(self.danh_sach_muc_tieu)
+        
+        # Kết nối tín hiệu
+        self.attacker_sql.log_process.connect(self.ui.textBrowser.append)
+        self.attacker_sql.ket_qua_scan.connect(self.dien_vao_bang)
+        self.attacker_sql.hoan_thanh.connect(lambda: QMessageBox.information(self, "Xong", "Đã quét xong SQLi!"))
+        
+        self.attacker_sql.start()
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = PhanMemLFI()

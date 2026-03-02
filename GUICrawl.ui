@@ -145,6 +145,19 @@
      <string>Tấn công path traversal</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="btnSQLi">
+    <property name="geometry">
+     <rect>
+      <x>580</x>
+      <y>50</y>
+      <width>91</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Tấn công SQLi</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
